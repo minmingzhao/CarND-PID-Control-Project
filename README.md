@@ -12,18 +12,21 @@ D gain, or derivative gain, is to account for the trend of the error based on it
 ### Describe how the final hyperparameters were chosen.
 I believe the initial tuning has to be manual so as to have a valid CTE from the simulator. Firstly I only focus on the steering value and leave throttle value at default 0.3. With basic understanding of the effects of P,I,D, we firstly identify whether if P gain is too large or too small based on the effectiveness of the steering correction. Then add some D gain to avoid the large overshoot. 
 
-Then I use twiddle to fine tune the parameter. I realized I could not directly implement twiddle algorithm from Prof. Thrun's course as I don't have the explicit `err = run()` function. Hence some tweak is needed in the actual twiddle implementation. I select 100 steps for tuning the twiddle, and let another 100 steps for evaluation of the tuning while we acculmulate the total_error. However the initial manual tuning plays an important role. Final P_gain = 0.11, I_gain = 0, D_gain = 3.185. 
+Then I use twiddle to fine tune the parameter. I realized I could not directly implement twiddle algorithm from Prof. Thrun's course as I don't have the explicit `err = run()` function. Hence some tweak is needed in the actual twiddle implementation. I select 100 steps for tuning the twiddle, and let another 100 steps for evaluation of the tuning while we acculmulate the total_error. However the initial manual tuning plays an important role. Final P_gain = 0.11, I_gain = 0, D_gain = 3.185. Based on my observation, the effect of having zero I gain or big I gain is very minor, and I believe it is due to we do not have bias in CTE measurement. 
+
 
 Also I implemented PID for throttle control. Apparently the throttle should be symmetric to either positive or negative CTE, since either too left or too right should both brake the vehicle. Hence I take `fabs(cte)` instead of normal `cte` as an input to the `UpdateError` function. Ideally we may need to have separate `UpdateError` function for throttle but actually here it is not too bad on simulator. The final throttle P_gain = 0.136, I_gain = 0, D_gain = 0.0728. 
 
 The final optimized PID control could be like the [final optimized video](https://github.com/minmingzhao/CarND-PID-Control-Project/blob/master/result_movie/optimized_PID_60-80mph-1lap-480p.mov). 
 
 I also studied the effect of having different / wrong PID on this simulator: 
+
 [Large_P_gain.mov](https://github.com/minmingzhao/CarND-PID-Control-Project/blob/master/result_movie/Large_P_gain.mov): big overshoot observed if large P_gain (=1) presented. 
 
 [VeryLarge_D_gain.mov](https://github.com/minmingzhao/CarND-PID-Control-Project/blob/master/result_movie/VeryLarge_D_gain.mov): will constantly change steering wheel which leads to very low vehicle speed and almost no effective steering action. 
 
 [Only_PI_Gain.mov](https://github.com/minmingzhao/CarND-PID-Control-Project/blob/master/result_movie/Only_PI_Gain.mov): no D gain will constantly overshoots. 
+
 
 ---
 
